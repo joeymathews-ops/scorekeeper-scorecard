@@ -48,13 +48,13 @@
   .brand .sub { font-size: 12px; color: var(--muted); }
 
   .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  button.btn, a.btn {
+  button.btn, a.btn, label.btn {
     appearance: none; border: 1px solid var(--border); background: var(--panel);
     color: var(--text); padding: 9px 14px; border-radius: 10px; cursor: pointer;
     font-size: 13px; font-weight: 600; transition: all .15s ease; text-decoration: none;
     display: inline-flex; align-items: center; gap: 6px;
   }
-  button.btn:hover, a.btn:hover { border-color: #2f3845; background: var(--panel-2); }
+  button.btn:hover, a.btn:hover, label.btn:hover { border-color: #2f3845; background: var(--panel-2); }
   button.btn.primary {
     background: linear-gradient(135deg, var(--accent), #ff8a47);
     border-color: transparent; color: #1a1106;
@@ -72,15 +72,17 @@
   }
   .tab.active { background: var(--panel-2); color: var(--text); }
   .tab:hover { color: var(--text); }
+  .tab .count {
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 999px; padding: 1px 8px; font-size: 11px; margin-left: 6px;
+  }
 
-  .conn {
+  .badge {
     display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
     color: var(--muted); padding: 6px 10px; border-radius: 999px;
     background: var(--panel); border: 1px solid var(--border);
   }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
-  .conn.online .dot { background: var(--pos); box-shadow: 0 0 8px var(--pos); }
-  .conn.offline .dot { background: var(--neu); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pos); box-shadow: 0 0 8px var(--pos); }
 
   .card {
     background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
@@ -188,14 +190,13 @@
   .check-row { display: flex; align-items: center; gap: 10px; }
   .check-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
 
-  /* Submissions table */
   .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
   .filter-bar .field { flex: 1; min-width: 160px; }
   table.subs { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
   table.subs th, table.subs td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
-  table.subs th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; background: var(--panel-2); position: sticky; top: 0; }
+  table.subs th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; background: var(--panel-2); position: sticky; top: 0; z-index: 1; }
   table.subs tr:hover td { background: rgba(255,255,255,0.02); }
-  .pill-score { padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; border: 1px solid var(--border); }
+  .pill-score { padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; border: 1px solid var(--border); display: inline-block; }
   .pill-score.pos { color: #c8f5dc; border-color: var(--pos); background: var(--pos-soft); }
   .pill-score.neu { color: #fff3c2; border-color: var(--neu); background: var(--neu-soft); }
   .pill-score.neg { color: #ffd9d9; border-color: var(--neg); background: var(--neg-soft); }
@@ -217,11 +218,22 @@
   }
   .modal h3 { margin: 0 0 12px; font-size: 16px; }
   .modal .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
-  pre.detail {
+
+  .detail-section { margin-bottom: 16px; }
+  .detail-section h4 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13px; }
+  .detail-grid div b { color: var(--muted); font-weight: 600; margin-right: 6px; }
+  .std-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
     background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
-    padding: 12px; font-size: 12px; max-height: 60vh; overflow: auto; white-space: pre-wrap;
-    color: var(--text);
+    margin-bottom: 6px; font-size: 13px;
   }
+  .std-row .label { flex: 1; }
+  .std-row .rating { font-weight: 700; padding: 3px 10px; border-radius: 999px; font-size: 11px; border: 1px solid var(--border); }
+  .std-row .rating.Positive { color: #c8f5dc; border-color: var(--pos); background: var(--pos-soft); }
+  .std-row .rating.Neutral  { color: #fff3c2; border-color: var(--neu); background: var(--neu-soft); }
+  .std-row .rating.Negative { color: #ffd9d9; border-color: var(--neg); background: var(--neg-soft); }
+  .std-comment { color: var(--muted); font-size: 12px; margin: 4px 0 8px 4px; }
 
   footer.note { margin-top: 24px; color: var(--muted); font-size: 12px; text-align: center; }
 
@@ -242,11 +254,12 @@
     .standard { grid-template-columns: 1fr; }
     .signoff-grid { grid-template-columns: 1fr; }
     .stats { grid-template-columns: repeat(2, 1fr); }
+    .detail-grid { grid-template-columns: 1fr; }
   }
 
   @media print {
     body { background: #fff; color: #000; }
-    .actions, .guide-toggle, .score-bar, .tabs, .conn { display: none !important; }
+    .actions, .guide-toggle, .score-bar, .tabs, .badge { display: none !important; }
     .card, .standard { break-inside: avoid; box-shadow: none; border-color: #ccc; background: #fff; color: #000; }
     .field input, .field select, .field textarea, .comment textarea { background: #fff; color: #000; border-color: #ccc; }
     .rate-btn { color: #000; background: #f4f4f4; }
@@ -266,9 +279,9 @@
       </div>
       <div class="tabs">
         <button class="tab active" data-view="score">New Scorecard</button>
-        <button class="tab" data-view="subs">Submissions</button>
+        <button class="tab" data-view="subs">Submissions <span class="count" id="tab-count">0</span></button>
       </div>
-      <div class="conn" id="conn"><span class="dot"></span><span id="conn-text">Local only</span></div>
+      <div class="badge"><span class="dot"></span><span>Stored on this device</span></div>
     </header>
 
     <!-- =================== SCORE VIEW =================== -->
@@ -279,7 +292,7 @@
         <button class="btn" id="btn-reset">Reset</button>
         <button class="btn" id="btn-export">Export JSON</button>
         <button class="btn" id="btn-print">Print PDF</button>
-        <button class="btn primary" id="btn-submit">Submit to Sheet</button>
+        <button class="btn primary" id="btn-submit">Submit</button>
       </div>
 
       <section class="card">
@@ -361,9 +374,12 @@
     <!-- =================== SUBMISSIONS VIEW =================== -->
     <section class="view" id="view-subs">
       <div class="actions" style="margin-bottom:14px; justify-content: flex-end;">
-        <button class="btn" id="btn-refresh">Refresh</button>
         <button class="btn" id="btn-csv">Export CSV</button>
-        <button class="btn" id="btn-logout">Lock</button>
+        <button class="btn" id="btn-backup">Backup All (JSON)</button>
+        <label class="btn" for="file-restore">Import Backup
+          <input id="file-restore" type="file" accept="application/json" style="display:none;" />
+        </label>
+        <button class="btn" id="btn-clear-all" style="border-color:#3a2326;color:#ffb1b3;">Clear All</button>
       </div>
 
       <div class="stats" id="stats"></div>
@@ -399,48 +415,31 @@
             <tbody id="subs-body"></tbody>
           </table>
         </div>
-        <div class="empty" id="subs-empty" style="display:none;">No submissions match.</div>
+        <div class="empty" id="subs-empty" style="display:none;">No submissions yet — submit a scorecard to see it here.</div>
       </section>
     </section>
 
-    <footer class="note" id="footer-note"></footer>
-  </div>
-
-  <!-- Admin Key modal -->
-  <div class="modal-mask" id="modal-admin">
-    <div class="modal">
-      <h3>View submissions</h3>
-      <div class="field">
-        <label>Admin Key</label>
-        <input id="admin-key-in" type="password" placeholder="Enter admin key" />
-      </div>
-      <div class="row">
-        <button class="btn" id="admin-cancel">Cancel</button>
-        <button class="btn primary" id="admin-go">Unlock</button>
-      </div>
-    </div>
+    <footer class="note">All data is stored privately in this browser's localStorage. Use Backup / Import to move data between devices.</footer>
   </div>
 
   <!-- Detail modal -->
   <div class="modal-mask" id="modal-detail">
-    <div class="modal" style="min-width:520px;">
+    <div class="modal" style="min-width:560px;">
       <h3 id="detail-title">Scorecard detail</h3>
-      <pre class="detail" id="detail-body"></pre>
+      <div id="detail-body"></div>
       <div class="row">
-        <button class="btn" id="detail-close">Close</button>
+        <button class="btn" id="detail-delete" style="border-color:#3a2326;color:#ffb1b3;margin-right:auto;">Delete</button>
+        <button class="btn" id="detail-print">Print</button>
+        <button class="btn primary" id="detail-close">Close</button>
       </div>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
-<script src="config.js"></script>
 <script>
-  const CFG = window.SCORECARD_CONFIG || {};
-  const HAS_BACKEND = !!CFG.APPS_SCRIPT_URL;
-
   const STANDARDS = [
-    { id: 's1', weight: 0.10,
+    { id: 's1', label: "Reliability & Attendance", weight: 0.10,
       question: "How consistently does the Scorekeeper demonstrate reliability in attendance, including being punctual for scheduled games, arriving prepared to begin scorekeeping on time, and maintaining focus and professionalism throughout the shift?",
       guide: {
         Negative: ["Frequently late to scheduled games or shifts.","Occasionally misses scheduled assignments or requires last-minute coverage.","Arrives unprepared to begin scorekeeping on time (not set up, distracted, or lacking focus).","Requires reminders about schedule expectations or responsibilities.","Reliability issues disrupt game operations or create challenges for staff or teams."],
@@ -448,7 +447,7 @@
         Positive: ["Consistently arrives early or right on time for scheduled games.","Fully prepared to begin scorekeeping promptly and ensures everything is ready before the game starts.","Demonstrates strong focus, attentiveness, and professionalism throughout the shift.","Communicates proactively about scheduling or availability when needed.","Serves as a dependable and reliable member of the game operations team."]
       }
     },
-    { id: 's2', weight: 0.10,
+    { id: 's2', label: "Setup / Teardown", weight: 0.10,
       question: "How effectively does the Scorekeeper manage the scorekeeper table setup and teardown, including preparing equipment before games, maintaining an organized table during play, and properly packing up materials after games?",
       guide: {
         Negative: ["Scorekeeper table is not properly set up before games begin.","Equipment (scoresheet, tablet, clock controls, pens, etc.) may be missing, disorganized, or not ready for use.","Requires reminders or assistance to complete setup.","Table area becomes cluttered or disorganized during the game.","Teardown is incomplete or materials are left out of place after games."],
@@ -456,7 +455,7 @@
         Positive: ["Consistently completes full scorekeeper table setup before games start.","Ensures all materials and equipment are organized, accessible, and ready to use.","Maintains a clean and well-organized table throughout the game.","Completes thorough teardown and ensures equipment is properly stored.","Demonstrates strong ownership and professionalism in managing the scorekeeper table area."]
       }
     },
-    { id: 's3', weight: 0.30,
+    { id: 's3', label: "BallerTV Operations", weight: 0.30,
       question: "How effectively does the Scorekeeper manage BallerTV operations, including setting up and tearing down equipment correctly, troubleshooting issues as they arise, using the equipment properly, and ensuring live streams are successfully recorded while maintaining accurate stats entry on the BallerTV iPad?",
       guide: {
         Negative: ["Setup/teardown is often incomplete, incorrect, or delayed (camera placement, power, connections, mounting, etc.).","Struggles to operate BallerTV equipment confidently or uses it incorrectly without seeking help early.","Troubleshooting is slow or ineffective, resulting in missed coverage or extended downtime.","Live streams are not consistently started on time, interrupted, or fail to record due to preventable errors.","Stats entry on the iPad is inconsistent, inaccurate, or not maintained throughout the game."],
@@ -464,7 +463,7 @@
         Positive: ["Consistently completes correct, efficient setup and teardown of BallerTV equipment every shift.","Confidently and correctly operates all required equipment and follows best practices without reminders.","Proactively identifies and resolves issues quickly (or escalates immediately when necessary) to minimize disruption.","Ensures live streams start on time, remain stable, and are successfully recorded for every game.","Maintains accurate, timely stats entry on the BallerTV iPad throughout the game, demonstrating strong attention to detail and consistency."]
       }
     },
-    { id: 's4', weight: 0.20,
+    { id: 's4', label: "Stat Accuracy", weight: 0.20,
       question: "How accurately and consistently does the Scorekeeper record game statistics, ensuring plays, scores, fouls, and other key information are entered correctly and in real time?",
       guide: {
         Negative: ["Frequently records incorrect or missing stats during games.","Falls behind on stat entry, requiring corrections after plays or by supervisors.","Demonstrates limited understanding of stat tracking procedures.","Errors impact the accuracy of the game record or BallerTV reporting.","Requires frequent reminders or assistance to maintain stat accuracy."],
@@ -472,7 +471,7 @@
         Positive: ["Consistently records all game statistics accurately and in real time.","Demonstrates strong attention to detail and awareness of gameplay events.","Rarely requires corrections and maintains a reliable official game record.","Quickly identifies and corrects minor discrepancies when they occur.","Contributes to smooth game operations through highly accurate stat tracking."]
       }
     },
-    { id: 's5', weight: 0.30,
+    { id: 's5', label: "Player Engagement", weight: 0.30,
       question: "How effectively does the Scorekeeper engage with players on their court, demonstrating professionalism, approachability, and clear communication to support a positive game environment?",
       guide: {
         Negative: ["Rarely interacts with players or appears disengaged from the court environment.","Communication with players may be unclear, dismissive, or unprofessional.","Does not acknowledge players when appropriate (e.g., answering score questions, clarifying fouls, etc.).","Body language or attitude may appear uninterested or unapproachable.","Requires reminders to maintain a professional and supportive presence at the court."],
@@ -482,8 +481,9 @@
     }
   ];
 
-  const STORAGE_KEY = "scorekeeper-scorecard-draft-v1";
-  const ADMIN_CACHE = "scorekeeper-admin-key";
+  const DRAFT_KEY = "scorekeeper-scorecard-draft-v1";
+  const SUBS_KEY  = "scorekeeper-scorecard-submissions-v1";
+
   const ratings = {};
   const comments = {};
 
@@ -521,7 +521,7 @@
     const wrap = el("div", { class: "standard", "data-id": s.id });
     const left = el("div");
     left.appendChild(el("div", { class: "q-num" }, [
-      `Standard ${i+1}`,
+      `Standard ${i+1} — ${s.label}`,
       el("span", { class: "weight" }, `${Math.round(s.weight*100)}% weight`)
     ]));
     left.appendChild(el("p", { class: "q" }, s.question));
@@ -566,60 +566,76 @@
 
   function ratingValue(r) { return r === "Positive" ? 1 : r === "Neutral" ? 0.5 : r === "Negative" ? 0 : null; }
 
-  function updateScore() {
+  function computeScore() {
     let total = 0, anyRated = false;
     STANDARDS.forEach(s => {
       const v = ratingValue(ratings[s.id]);
       if (v !== null) { total += v * s.weight; anyRated = true; }
     });
-    const pct = Math.round(total * 100);
+    return { pct: anyRated ? Math.round(total * 100) : 0, anyRated };
+  }
+
+  function verdictFor(pct) {
+    if (pct >= 80) return "Exceeds";
+    if (pct >= 50) return "Meets";
+    return "Needs Improvement";
+  }
+
+  function updateScore() {
+    const { pct, anyRated } = computeScore();
     document.getElementById("score-fill").style.width = pct + "%";
     document.getElementById("score-num").textContent = pct + "%";
     const v = document.getElementById("verdict");
     v.classList.remove("pos","neu","neg");
     if (!anyRated) { v.textContent = "Not started"; return; }
-    if (pct >= 80) { v.textContent = "Exceeds Expectations"; v.classList.add("pos"); }
-    else if (pct >= 50) { v.textContent = "Meets Expectations"; v.classList.add("neu"); }
-    else { v.textContent = "Needs Improvement"; v.classList.add("neg"); }
+    const verd = verdictFor(pct);
+    v.textContent = verd === "Exceeds" ? "Exceeds Expectations" : verd === "Meets" ? "Meets Expectations" : "Needs Improvement";
+    v.classList.add(verd === "Exceeds" ? "pos" : verd === "Meets" ? "neu" : "neg");
   }
+
+  function val(id) { return document.getElementById(id).value; }
+  function setVal(id, v) { const e = document.getElementById(id); if (e && v != null) e.value = v; }
 
   function fields() {
     return {
       location: val("location"), province: val("province"), scorekeeper: val("scorekeeper"),
       dm: val("dm"), lm: val("lm"), date: val("date"), atype: val("atype"),
       gotit: document.getElementById("gotit").checked, gotitName: val("gotit-name"),
-      followUp: val("follow-up"), additional: val("addl"), ratings, comments
+      followUp: val("follow-up"), additional: val("addl"),
+      ratings: { ...ratings }, comments: { ...comments }
     };
   }
-  function val(id) { return document.getElementById(id).value; }
-  function setVal(id, v) { const e = document.getElementById(id); if (e && v != null) e.value = v; }
 
   function setFields(d) {
     if (!d) return;
-    ["location","province","scorekeeper","dm","lm","date","atype","gotit-name","follow-up","addl"].forEach(k => setVal(k, d[k] || d[k.replace("-","")] ));
+    setVal("location", d.location); setVal("province", d.province); setVal("scorekeeper", d.scorekeeper);
+    setVal("dm", d.dm); setVal("lm", d.lm); setVal("date", d.date); setVal("atype", d.atype);
     setVal("gotit-name", d.gotitName); setVal("follow-up", d.followUp); setVal("addl", d.additional);
     document.getElementById("gotit").checked = !!d.gotit;
+
+    Object.keys(ratings).forEach(k => delete ratings[k]);
+    Object.keys(comments).forEach(k => delete comments[k]);
     Object.assign(ratings, d.ratings || {});
     Object.assign(comments, d.comments || {});
     STANDARDS.forEach(s => {
       const wrap = document.querySelector(`.standard[data-id="${s.id}"]`);
       if (!wrap) return;
       const ta = wrap.querySelector("textarea");
-      if (ta && comments[s.id]) ta.value = comments[s.id];
+      if (ta) ta.value = comments[s.id] || "";
       wrap.querySelectorAll(".rate-btn").forEach(b => b.classList.toggle("active", b.dataset.val === ratings[s.id]));
     });
     updateScore();
   }
 
-  function saveDraft() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fields())); } catch (e) {} }
+  function saveDraft() { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(fields())); } catch (e) {} }
   function loadDraft() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(DRAFT_KEY);
       if (!raw) return toast("No draft saved");
       setFields(JSON.parse(raw)); toast("Draft loaded");
     } catch (e) { toast("Failed to load draft"); }
   }
-  function clearAll() {
+  function clearForm() {
     if (!confirm("Reset the entire scorecard?")) return;
     Object.keys(ratings).forEach(k => delete ratings[k]);
     Object.keys(comments).forEach(k => delete comments[k]);
@@ -628,7 +644,7 @@
     });
     document.getElementById("atype").value = "Planned";
     document.querySelectorAll(".rate-btn").forEach(b => b.classList.remove("active"));
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(DRAFT_KEY);
     document.getElementById("date").valueAsDate = new Date();
     updateScore(); toast("Reset");
   }
@@ -644,36 +660,47 @@
     a.click(); URL.revokeObjectURL(url);
   }
 
-  async function submitToSheet() {
-    if (!HAS_BACKEND) {
-      toast("Backend not configured — exporting JSON instead");
-      exportJSON(); return;
-    }
+  // ====== Submissions store ======
+  function getSubs() {
+    try { return JSON.parse(localStorage.getItem(SUBS_KEY) || "[]"); }
+    catch (e) { return []; }
+  }
+  function setSubs(arr) {
+    localStorage.setItem(SUBS_KEY, JSON.stringify(arr));
+    document.getElementById("tab-count").textContent = String(arr.length);
+  }
+
+  function submitScorecard() {
     const d = fields();
-    if (!d.scorekeeper) return toast("Add scorekeeper name first");
-    const payload = Object.assign({}, d, { submitKey: CFG.SUBMIT_KEY });
-    const btns = document.querySelectorAll("#btn-submit, #btn-submit-2");
-    btns.forEach(b => b.disabled = true);
-    try {
-      // Apps Script web apps don't allow custom headers without preflight; send as text/plain to avoid CORS preflight
-      const r = await fetch(CFG.APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || "submission failed");
-      toast(`Submitted • Score ${j.score}% • ${j.verdict}`);
-    } catch (err) {
-      toast("Submit failed: " + err.message);
-    } finally {
-      btns.forEach(b => b.disabled = false);
-    }
+    if (!d.scorekeeper.trim()) return toast("Add scorekeeper name first");
+    const { pct, anyRated } = computeScore();
+    if (!anyRated) return toast("Rate at least one standard");
+    const submission = {
+      id: "sc_" + Date.now() + "_" + Math.random().toString(36).slice(2,7),
+      submittedAt: new Date().toISOString(),
+      score: pct,
+      verdict: verdictFor(pct),
+      ...d
+    };
+    const all = getSubs();
+    all.push(submission);
+    setSubs(all);
+    localStorage.removeItem(DRAFT_KEY);
+    // clear form
+    Object.keys(ratings).forEach(k => delete ratings[k]);
+    Object.keys(comments).forEach(k => delete comments[k]);
+    document.querySelectorAll("#view-score input, #view-score textarea").forEach(i => {
+      if (i.type === "checkbox") i.checked = false; else i.value = "";
+    });
+    document.getElementById("atype").value = "Planned";
+    document.querySelectorAll(".rate-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("date").valueAsDate = new Date();
+    updateScore();
+    renderSubs();
+    toast(`Saved • Score ${pct}% • ${verdictFor(pct)}`);
   }
 
   // ====== Submissions view ======
-  let _rows = [];
-
   function showStats(rows) {
     const box = document.getElementById("stats");
     box.innerHTML = "";
@@ -701,13 +728,22 @@
     return "";
   }
 
-  function renderRows() {
+  function renderSubs() {
+    const all = getSubs().slice().reverse();
+    setSubs(getSubs()); // refresh count
     const tbody = document.getElementById("subs-body");
     tbody.innerHTML = "";
+
+    // populate location filter
+    const sel = document.getElementById("f-loc");
+    const prevLoc = sel.value;
+    const locs = Array.from(new Set(all.map(r => r.location).filter(Boolean))).sort();
+    sel.innerHTML = `<option value="">All</option>` + locs.map(l => `<option ${l===prevLoc?"selected":""}>${l}</option>`).join("");
+
     const q = document.getElementById("f-search").value.toLowerCase();
-    const loc = document.getElementById("f-loc").value;
+    const loc = sel.value;
     const verdict = document.getElementById("f-verdict").value;
-    const filtered = _rows.filter(r => {
+    const filtered = all.filter(r => {
       if (loc && r.location !== loc) return false;
       if (verdict && r.verdict !== verdict) return false;
       if (q) {
@@ -720,8 +756,7 @@
     showStats(filtered);
     filtered.forEach(r => {
       const tr = el("tr");
-      const dateStr = r.date || (r.submittedAt ? r.submittedAt.slice(0,10) : "");
-      tr.appendChild(el("td", {}, dateStr));
+      tr.appendChild(el("td", {}, r.date || (r.submittedAt || "").slice(0,10)));
       tr.appendChild(el("td", {}, r.scorekeeper || "—"));
       tr.appendChild(el("td", {}, r.location || "—"));
       tr.appendChild(el("td", {}, r.dm || "—"));
@@ -735,58 +770,135 @@
     });
   }
 
+  let _detailId = null;
+
   function showDetail(r) {
+    _detailId = r.id;
     document.getElementById("detail-title").textContent = `${r.scorekeeper || "Scorekeeper"} — ${r.date || ""}`;
-    const lines = [];
-    const map = [
-      ["Submitted", r.submittedAt], ["Location", r.location], ["Province", r.province],
-      ["DM", r.dm], ["LM", r.lm], ["Type", r.atype],
-      ["Score", (r.score||0) + "% — " + (r.verdict||"")],
-      ["", ""],
-      ["Reliability (10%)",   `${r.s1_rating || "—"}${r.s1_comment ? "\n  " + r.s1_comment : ""}`],
-      ["Setup/Teardown (10%)",`${r.s2_rating || "—"}${r.s2_comment ? "\n  " + r.s2_comment : ""}`],
-      ["BallerTV (30%)",      `${r.s3_rating || "—"}${r.s3_comment ? "\n  " + r.s3_comment : ""}`],
-      ["Stat Accuracy (20%)", `${r.s4_rating || "—"}${r.s4_comment ? "\n  " + r.s4_comment : ""}`],
-      ["Player Engagement (30%)", `${r.s5_rating || "—"}${r.s5_comment ? "\n  " + r.s5_comment : ""}`],
-      ["", ""],
-      ["Got It", r.gotIt + (r.gotItName ? ` (${r.gotItName})` : "")],
-      ["Follow-Up", r.followUp || "—"],
-      ["Additional Comments", r.additional || "—"]
-    ];
-    lines.push(...map.map(([k,v]) => k ? `${k}: ${v}` : ""));
-    document.getElementById("detail-body").textContent = lines.join("\n");
+    const body = document.getElementById("detail-body");
+    body.innerHTML = "";
+
+    const sec1 = el("div", { class: "detail-section" });
+    sec1.appendChild(el("h4", {}, "Header"));
+    const grid = el("div", { class: "detail-grid" });
+    [
+      ["Location", `${r.location || "—"}, ${r.province || "—"}`],
+      ["Date", r.date || "—"],
+      ["DM", r.dm || "—"],
+      ["LM", r.lm || "—"],
+      ["Type", r.atype || "—"],
+      ["Submitted", new Date(r.submittedAt).toLocaleString()]
+    ].forEach(([k,v]) => grid.appendChild(el("div", {}, [el("b", {}, k+":"), v])));
+    sec1.appendChild(grid);
+    body.appendChild(sec1);
+
+    const sec2 = el("div", { class: "detail-section" });
+    const score = el("h4", {}, [`Score: `, el("span", { class: "pill-score " + pillCls(r.verdict), style: "margin-left:6px;" }, (r.score||0) + "% — " + (r.verdict || ""))]);
+    sec2.appendChild(score);
+    STANDARDS.forEach(s => {
+      const rt = (r.ratings || {})[s.id] || "—";
+      const ct = (r.comments || {})[s.id] || "";
+      const row = el("div", { class: "std-row" });
+      row.appendChild(el("div", { class: "label" }, `${s.label} (${Math.round(s.weight*100)}%)`));
+      row.appendChild(el("div", { class: "rating " + (rt === "Positive" || rt === "Neutral" || rt === "Negative" ? rt : "") }, rt));
+      sec2.appendChild(row);
+      if (ct) sec2.appendChild(el("div", { class: "std-comment" }, "“" + ct + "”"));
+    });
+    body.appendChild(sec2);
+
+    const sec3 = el("div", { class: "detail-section" });
+    sec3.appendChild(el("h4", {}, "Sign-Off"));
+    const grid2 = el("div", { class: "detail-grid" });
+    [
+      ["Got It", r.gotit ? "Yes" + (r.gotitName ? ` (${r.gotitName})` : "") : "No"],
+      ["Follow-Up", r.followUp || "—"]
+    ].forEach(([k,v]) => grid2.appendChild(el("div", {}, [el("b", {}, k+":"), v])));
+    sec3.appendChild(grid2);
+    if (r.additional) {
+      sec3.appendChild(el("div", { class: "std-comment", style: "margin-top:8px;" }, "“" + r.additional + "”"));
+    }
+    body.appendChild(sec3);
+
     document.getElementById("modal-detail").classList.add("show");
   }
 
-  async function loadSubmissions(adminKey) {
-    if (!HAS_BACKEND) return toast("Backend not configured");
-    try {
-      const r = await fetch(`${CFG.APPS_SCRIPT_URL}?action=list&key=${encodeURIComponent(adminKey)}`);
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || "load failed");
-      _rows = (j.rows || []).reverse();
-      const locs = Array.from(new Set(_rows.map(r => r.location).filter(Boolean))).sort();
-      const sel = document.getElementById("f-loc");
-      sel.innerHTML = `<option value="">All</option>` + locs.map(l => `<option>${l}</option>`).join("");
-      renderRows();
-      sessionStorage.setItem(ADMIN_CACHE, adminKey);
-    } catch (err) {
-      toast("Load failed: " + err.message);
-      sessionStorage.removeItem(ADMIN_CACHE);
-    }
+  function deleteDetail() {
+    if (!_detailId) return;
+    if (!confirm("Delete this scorecard? This cannot be undone.")) return;
+    const all = getSubs().filter(r => r.id !== _detailId);
+    setSubs(all);
+    document.getElementById("modal-detail").classList.remove("show");
+    _detailId = null;
+    renderSubs();
+    toast("Deleted");
   }
 
   function exportCSV() {
-    if (!_rows.length) return toast("Nothing to export");
+    const all = getSubs();
+    if (!all.length) return toast("Nothing to export");
     const cols = ["submittedAt","date","scorekeeper","location","province","dm","lm","atype","score","verdict",
-      "s1_rating","s2_rating","s3_rating","s4_rating","s5_rating","gotIt","gotItName","followUp","additional"];
+      "s1_rating","s2_rating","s3_rating","s4_rating","s5_rating",
+      "s1_comment","s2_comment","s3_comment","s4_comment","s5_comment",
+      "gotit","gotitName","followUp","additional"];
+    const flat = all.map(r => {
+      const o = { ...r };
+      ["s1","s2","s3","s4","s5"].forEach(k => {
+        o[k+"_rating"] = (r.ratings || {})[k] || "";
+        o[k+"_comment"] = (r.comments || {})[k] || "";
+      });
+      return o;
+    });
     const esc = v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
-    const lines = [cols.join(",")].concat(_rows.map(r => cols.map(c => esc(r[c])).join(",")));
+    const lines = [cols.join(",")].concat(flat.map(r => cols.map(c => esc(r[c])).join(",")));
     const blob = new Blob([lines.join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `scorecards_${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
+  }
+
+  function backupAll() {
+    const all = getSubs();
+    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), submissions: all }, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `scorecard_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+  }
+
+  function importBackup(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const j = JSON.parse(reader.result);
+        const arr = Array.isArray(j) ? j : (j.submissions || []);
+        if (!Array.isArray(arr)) throw new Error("Invalid backup format");
+        const choice = confirm(`Import ${arr.length} submission(s)?\n\nOK = Merge with existing\nCancel = Replace all existing`);
+        const existing = getSubs();
+        let merged;
+        if (choice) {
+          const seen = new Set(existing.map(r => r.id));
+          merged = existing.concat(arr.filter(r => r.id && !seen.has(r.id)));
+        } else {
+          merged = arr;
+        }
+        setSubs(merged);
+        renderSubs();
+        toast(`Imported ${arr.length} submission(s)`);
+      } catch (e) {
+        toast("Import failed: " + e.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function clearAllSubs() {
+    const all = getSubs();
+    if (!all.length) return toast("Nothing to clear");
+    if (!confirm(`Permanently delete all ${all.length} submission(s) on this device?\n\nTip: use Backup All first if you want a copy.`)) return;
+    setSubs([]);
+    renderSubs();
+    toast("All submissions cleared");
   }
 
   // ====== Tabs / modal ======
@@ -795,43 +907,26 @@
       const v = t.dataset.view;
       document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
       document.querySelectorAll(".view").forEach(x => x.classList.toggle("active", x.id === "view-" + v));
-      if (v === "subs") {
-        const cached = sessionStorage.getItem(ADMIN_CACHE);
-        if (HAS_BACKEND && cached) loadSubmissions(cached);
-        else if (HAS_BACKEND) document.getElementById("modal-admin").classList.add("show");
-        else toast("Backend not configured — see config.js");
-      }
+      if (v === "subs") renderSubs();
     });
   });
 
-  document.getElementById("admin-cancel").addEventListener("click", () => {
-    document.getElementById("modal-admin").classList.remove("show");
-  });
-  document.getElementById("admin-go").addEventListener("click", () => {
-    const k = document.getElementById("admin-key-in").value.trim();
-    if (!k) return;
-    document.getElementById("modal-admin").classList.remove("show");
-    loadSubmissions(k);
-  });
-  document.getElementById("admin-key-in").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") document.getElementById("admin-go").click();
-  });
   document.getElementById("detail-close").addEventListener("click", () => {
     document.getElementById("modal-detail").classList.remove("show");
+    _detailId = null;
   });
+  document.getElementById("detail-delete").addEventListener("click", deleteDetail);
+  document.getElementById("detail-print").addEventListener("click", () => window.print());
 
-  document.getElementById("btn-refresh").addEventListener("click", () => {
-    const cached = sessionStorage.getItem(ADMIN_CACHE);
-    if (cached) loadSubmissions(cached);
-    else document.getElementById("modal-admin").classList.add("show");
-  });
+  ["f-search","f-loc","f-verdict"].forEach(id => document.getElementById(id).addEventListener("input", renderSubs));
   document.getElementById("btn-csv").addEventListener("click", exportCSV);
-  document.getElementById("btn-logout").addEventListener("click", () => {
-    sessionStorage.removeItem(ADMIN_CACHE);
-    _rows = []; renderRows(); showStats([]);
-    toast("Locked");
+  document.getElementById("btn-backup").addEventListener("click", backupAll);
+  document.getElementById("file-restore").addEventListener("change", (e) => {
+    const f = e.target.files[0];
+    if (f) importBackup(f);
+    e.target.value = "";
   });
-  ["f-search","f-loc","f-verdict"].forEach(id => document.getElementById(id).addEventListener("input", renderRows));
+  document.getElementById("btn-clear-all").addEventListener("click", clearAllSubs);
 
   // ====== Boot ======
   document.getElementById("date").valueAsDate = new Date();
@@ -839,27 +934,17 @@
     const e = document.getElementById(id);
     e.addEventListener("input", saveDraft); e.addEventListener("change", saveDraft);
   });
-  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) setFields(JSON.parse(raw)); } catch (e) {}
+  try { const raw = localStorage.getItem(DRAFT_KEY); if (raw) setFields(JSON.parse(raw)); } catch (e) {}
 
   document.getElementById("btn-save").addEventListener("click", () => { saveDraft(); toast("Draft saved"); });
   document.getElementById("btn-load").addEventListener("click", loadDraft);
-  document.getElementById("btn-reset").addEventListener("click", clearAll);
+  document.getElementById("btn-reset").addEventListener("click", clearForm);
   document.getElementById("btn-export").addEventListener("click", exportJSON);
   document.getElementById("btn-print").addEventListener("click", () => window.print());
-  document.getElementById("btn-submit").addEventListener("click", submitToSheet);
-  document.getElementById("btn-submit-2").addEventListener("click", submitToSheet);
+  document.getElementById("btn-submit").addEventListener("click", submitScorecard);
+  document.getElementById("btn-submit-2").addEventListener("click", submitScorecard);
 
-  // Connection indicator
-  const conn = document.getElementById("conn");
-  const connText = document.getElementById("conn-text");
-  if (HAS_BACKEND) { conn.classList.add("online"); connText.textContent = "Connected to Sheet"; }
-  else { conn.classList.add("offline"); connText.textContent = "Local only — see config.js"; }
-
-  // Footer hint
-  const note = document.getElementById("footer-note");
-  note.textContent = HAS_BACKEND
-    ? "Submissions append to your Google Sheet. Drafts auto-save to this browser."
-    : "Backend not configured. Edit config.js with your Apps Script URL + keys to enable Submit and Submissions.";
+  document.getElementById("tab-count").textContent = String(getSubs().length);
 
   function toast(msg) {
     const t = document.getElementById("toast");

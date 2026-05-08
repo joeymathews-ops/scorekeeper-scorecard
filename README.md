@@ -1,36 +1,18 @@
 # Scorekeeper Scorecard
 
-Live web app for District Managers to evaluate Scorekeepers — automates the original Excel scorecard, calculates the weighted score live, submits to Google Sheets, and lets you browse all past evaluations on the Submissions tab (admin-key gated).
+Live web app for District Managers to evaluate Scorekeepers — automates the original Excel scorecard with live weighted scoring, draft auto-save, and a full history of past evaluations.
 
-## Setup (one-time, ~5 minutes)
+**Live site:** https://joeymathews-ops.github.io/scorekeeper-scorecard/
 
-### 1. Create the Google Sheet + Apps Script backend
-1. Create a new Google Sheet.
-2. Tools → Apps Script. Replace the default `Code.gs` with the contents of `apps-script.gs` from this repo.
-3. At the top of `Code.gs`, set `SUBMIT_KEY` and `ADMIN_KEY` to your own random strings.
-4. Click **Deploy → New deployment** → select type **Web app**.
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-5. Copy the **Web app URL**.
+## Features
+- **New Scorecard tab** — header info, 5 weighted standards (Negative / Neutral / Positive), per-standard comments, sign-off, additional comments. Live weighted score in the sticky bar.
+- **Submissions tab** — every Submit appends to a list with summary stats, search, location/verdict filters, full per-row detail view, delete, and CSV export.
+- **Backup All / Import Backup** — JSON export/import to move data between devices.
+- **Print PDF** — prints the current scorecard or detail view for sign-off copies.
 
-### 2. Configure the site
-Edit `config.js`:
-```js
-window.SCORECARD_CONFIG = {
-  APPS_SCRIPT_URL: "<paste the web app URL>",
-  SUBMIT_KEY: "<same as in Code.gs>",
-  ADMIN_KEY:  "<same as in Code.gs>"
-};
-```
+## Storage
+All data is stored in this browser's `localStorage` — no external database, no Google Sheet, no account.
 
-Commit + push. GitHub Pages auto-rebuilds on push.
+**Tradeoff:** each browser/device sees only what was submitted on it. To move data between devices, use Backup All on one device and Import Backup on the other. Clearing browser data will erase submissions, so back up periodically.
 
-## How it's used
-- **New Scorecard tab** — fill out header info, rate each of the 5 standards (Negative / Neutral / Positive), add comments, sign off. Live weighted score in the sticky bar.
-- **Submit to Sheet** — appends a row to the Sheet.
-- **Submissions tab** — enter the admin key once per session to view all submissions with filters, summary stats, and a CSV export.
-
-## Notes
-- Drafts auto-save in the browser (localStorage).
-- The submit key is a light spam guard, not real auth — anyone with the deployed URL can submit, but only people with the admin key can read.
-- For real access control, put this behind Google IAP / Cloudflare Access.
+If you want true cross-device sync, you'd need a small backend (e.g. Supabase free tier, ~3 min setup).
