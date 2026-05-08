@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scorekeeper Scorecard</title>
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #14181d;
+    --panel-2: #1a1f26;
+    --border: #232a33;
+    --text: #e8edf2;
+    --muted: #8b95a3;
+    --accent: #ff6b1a;
+    --accent-soft: rgba(255,107,26,0.12);
+    --pos: #28c76f;
+    --pos-soft: rgba(40,199,111,0.14);
+    --neu: #f1c40f;
+    --neu-soft: rgba(241,196,15,0.14);
+    --neg: #ea5455;
+    --neg-soft: rgba(234,84,85,0.14);
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 600px at 10% -10%, #1c2230 0%, var(--bg) 60%) fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 24px 96px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #ffae74);
+    display: grid; place-items: center; font-weight: 800; color: #1a1106;
+    box-shadow: var(--shadow);
+  }
+  .brand h1 { margin: 0; font-size: 18px; letter-spacing: 0.2px; }
+  .brand .sub { font-size: 12px; color: var(--muted); }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  button.btn, a.btn {
+    appearance: none; border: 1px solid var(--border); background: var(--panel);
+    color: var(--text); padding: 9px 14px; border-radius: 10px; cursor: pointer;
+    font-size: 13px; font-weight: 600; transition: all .15s ease; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  button.btn:hover, a.btn:hover { border-color: #2f3845; background: var(--panel-2); }
+  button.btn.primary {
+    background: linear-gradient(135deg, var(--accent), #ff8a47);
+    border-color: transparent; color: #1a1106;
+  }
+  button.btn.primary:hover { filter: brightness(1.05); }
+  button.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+  .tabs {
+    display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px;
+    background: var(--panel); border: 1px solid var(--border);
+  }
+  .tab {
+    background: transparent; border: 0; color: var(--muted); cursor: pointer;
+    padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  }
+  .tab.active { background: var(--panel-2); color: var(--text); }
+  .tab:hover { color: var(--text); }
+
+  .conn {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+    color: var(--muted); padding: 6px 10px; border-radius: 999px;
+    background: var(--panel); border: 1px solid var(--border);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .conn.online .dot { background: var(--pos); box-shadow: 0 0 8px var(--pos); }
+  .conn.offline .dot { background: var(--neu); }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    padding: 22px; box-shadow: var(--shadow); margin-bottom: 18px;
+  }
+
+  .info-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.span-2 { grid-column: span 2; }
+  .field.span-3 { grid-column: span 3; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .field input, .field select, .field textarea {
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 10px; padding: 10px 12px; font-size: 14px; font-family: inherit;
+    outline: none; transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  textarea { resize: vertical; min-height: 92px; }
+
+  .section-title { display: flex; align-items: center; gap: 12px; margin: 26px 4px 12px; }
+  .section-title h2 { margin: 0; font-size: 16px; letter-spacing: 0.3px; }
+  .section-title .pill {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 10px; border-radius: 999px;
+    border: 1px solid rgba(255,107,26,0.25);
+  }
+
+  .standard {
+    display: grid; grid-template-columns: 1fr 280px; gap: 18px;
+    padding: 18px; border-radius: 14px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--border); margin-bottom: 14px;
+    transition: border-color .15s ease;
+  }
+  .standard:hover { border-color: #2c3441; }
+  .standard .q-num {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .standard .weight {
+    background: var(--panel-2); color: var(--text); font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);
+  }
+  .standard p.q { margin: 0 0 12px; line-height: 1.55; font-size: 14px; }
+
+  .guide-toggle {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    color: var(--muted); font-size: 12px; user-select: none;
+  }
+  .guide-toggle:hover { color: var(--text); }
+  .guide-toggle .chev { transition: transform .15s ease; }
+  .guide-toggle.open .chev { transform: rotate(90deg); }
+
+  .guide {
+    display: none; margin-top: 12px; padding: 12px;
+    background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 10px;
+  }
+  .guide.open { display: block; }
+  .guide h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .guide h4.neg { color: var(--neg); }
+  .guide h4.neu { color: var(--neu); }
+  .guide h4.pos { color: var(--pos); }
+  .guide ul { margin: 0 0 12px 18px; padding: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .guide ul li { margin-bottom: 4px; }
+
+  .rate { display: flex; flex-direction: column; gap: 8px; }
+  .rate-row { display: flex; gap: 8px; }
+  .rate-btn {
+    flex: 1; padding: 12px 10px; border-radius: 12px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+    font-weight: 700; font-size: 13px; letter-spacing: 0.2px; text-align: center;
+    transition: all .15s ease;
+  }
+  .rate-btn:hover { transform: translateY(-1px); }
+  .rate-btn[data-val="Negative"].active { background: var(--neg-soft); border-color: var(--neg); color: #ffd9d9; }
+  .rate-btn[data-val="Neutral"].active  { background: var(--neu-soft); border-color: var(--neu); color: #fff3c2; }
+  .rate-btn[data-val="Positive"].active { background: var(--pos-soft); border-color: var(--pos); color: #c8f5dc; }
+
+  .comment textarea {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 10px; padding: 10px 12px; font-size: 13px;
+    font-family: inherit; min-height: 56px; outline: none;
+  }
+
+  .score-bar {
+    position: sticky; bottom: 14px; z-index: 10;
+    margin: 24px 0 0; display: grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center;
+    padding: 14px 18px; border-radius: 16px; border: 1px solid var(--border);
+    background: rgba(15,18,22,0.85); backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+  }
+  .score-meter { height: 10px; background: var(--panel-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+  .score-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--neg), var(--neu), var(--pos)); transition: width .25s ease; }
+  .score-num { font-size: 22px; font-weight: 800; min-width: 90px; text-align: right; }
+  .score-label { font-size: 12px; color: var(--muted); }
+  .verdict { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: var(--panel-2); }
+  .verdict.pos { color: #c8f5dc; border-color: var(--pos); background: var(--pos-soft); }
+  .verdict.neu { color: #fff3c2; border-color: var(--neu); background: var(--neu-soft); }
+  .verdict.neg { color: #ffd9d9; border-color: var(--neg); background: var(--neg-soft); }
+
+  .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .check-row { display: flex; align-items: center; gap: 10px; }
+  .check-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+
+  /* Submissions table */
+  .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
+  .filter-bar .field { flex: 1; min-width: 160px; }
+  table.subs { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  table.subs th, table.subs td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  table.subs th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; background: var(--panel-2); position: sticky; top: 0; }
+  table.subs tr:hover td { background: rgba(255,255,255,0.02); }
+  .pill-score { padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; border: 1px solid var(--border); }
+  .pill-score.pos { color: #c8f5dc; border-color: var(--pos); background: var(--pos-soft); }
+  .pill-score.neu { color: #fff3c2; border-color: var(--neu); background: var(--neu-soft); }
+  .pill-score.neg { color: #ffd9d9; border-color: var(--neg); background: var(--neg-soft); }
+  .empty { color: var(--muted); padding: 30px; text-align: center; font-size: 14px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+  .stat { padding: 14px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--border); }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .stat .value { font-size: 22px; font-weight: 800; margin-top: 4px; }
+
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none;
+    align-items: center; justify-content: center; z-index: 100;
+  }
+  .modal-mask.show { display: flex; }
+  .modal {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; min-width: 380px; max-width: 90vw; box-shadow: var(--shadow);
+  }
+  .modal h3 { margin: 0 0 12px; font-size: 16px; }
+  .modal .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+  pre.detail {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px; font-size: 12px; max-height: 60vh; overflow: auto; white-space: pre-wrap;
+    color: var(--text);
+  }
+
+  footer.note { margin-top: 24px; color: var(--muted); font-size: 12px; text-align: center; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 16px; border-radius: 10px; font-size: 13px; opacity: 0;
+    transition: all .25s ease; pointer-events: none; box-shadow: var(--shadow); z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  @media (max-width: 820px) {
+    .info-grid { grid-template-columns: repeat(2, 1fr); }
+    .field.span-2, .field.span-3 { grid-column: span 2; }
+    .standard { grid-template-columns: 1fr; }
+    .signoff-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media print {
+    body { background: #fff; color: #000; }
+    .actions, .guide-toggle, .score-bar, .tabs, .conn { display: none !important; }
+    .card, .standard { break-inside: avoid; box-shadow: none; border-color: #ccc; background: #fff; color: #000; }
+    .field input, .field select, .field textarea, .comment textarea { background: #fff; color: #000; border-color: #ccc; }
+    .rate-btn { color: #000; background: #f4f4f4; }
+    .wrap { max-width: 100%; padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">SK</div>
+        <div>
+          <h1>Scorekeeper Scorecard</h1>
+          <div class="sub">District Manager Assessment Tool</div>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-view="score">New Scorecard</button>
+        <button class="tab" data-view="subs">Submissions</button>
+      </div>
+      <div class="conn" id="conn"><span class="dot"></span><span id="conn-text">Local only</span></div>
+    </header>
+
+    <!-- =================== SCORE VIEW =================== -->
+    <section class="view active" id="view-score">
+      <div class="actions" style="margin-bottom:14px; justify-content: flex-end;">
+        <button class="btn" id="btn-load">Load Draft</button>
+        <button class="btn" id="btn-save">Save Draft</button>
+        <button class="btn" id="btn-reset">Reset</button>
+        <button class="btn" id="btn-export">Export JSON</button>
+        <button class="btn" id="btn-print">Print PDF</button>
+        <button class="btn primary" id="btn-submit">Submit to Sheet</button>
+      </div>
+
+      <section class="card">
+        <div class="info-grid">
+          <div class="field span-2">
+            <label for="location">Location</label>
+            <input id="location" type="text" placeholder="e.g. Burlington" />
+          </div>
+          <div class="field">
+            <label for="province">Province / State</label>
+            <input id="province" type="text" placeholder="ON" />
+          </div>
+          <div class="field span-3">
+            <label for="scorekeeper">Scorekeeper Name</label>
+            <input id="scorekeeper" type="text" placeholder="Staff being evaluated" />
+          </div>
+          <div class="field span-2">
+            <label for="dm">DM Name</label>
+            <input id="dm" type="text" placeholder="District Manager" />
+          </div>
+          <div class="field span-2">
+            <label for="lm">LM Name</label>
+            <input id="lm" type="text" placeholder="Location Manager" />
+          </div>
+          <div class="field">
+            <label for="date">Date</label>
+            <input id="date" type="date" />
+          </div>
+          <div class="field">
+            <label for="atype">Assessment Type</label>
+            <select id="atype">
+              <option>Planned</option>
+              <option>Unplanned</option>
+              <option>Follow-Up</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-title">
+        <h2>Operations &amp; Game Night Execution</h2>
+        <span class="pill">5 Standards</span>
+      </div>
+
+      <div id="standards"></div>
+
+      <div class="score-bar">
+        <div>
+          <div class="score-label">Weighted Score</div>
+          <div class="score-meter"><div class="score-fill" id="score-fill"></div></div>
+        </div>
+        <div class="score-num" id="score-num">0%</div>
+        <div class="verdict" id="verdict">Not started</div>
+        <button class="btn primary" id="btn-submit-2">Submit</button>
+      </div>
+
+      <div class="section-title"><h2>Sign-Off &amp; Comments</h2></div>
+      <section class="card">
+        <div class="signoff-grid">
+          <div class="field">
+            <label>Got It (acknowledged by Scorekeeper)</label>
+            <div class="check-row">
+              <input type="checkbox" id="gotit" />
+              <input id="gotit-name" type="text" placeholder="Type Scorekeeper full name to confirm" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="follow-up">Follow-Up Date</label>
+            <input id="follow-up" type="date" />
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="addl">Additional Comments</label>
+          <textarea id="addl" placeholder="Overall observations, action items, coaching notes..."></textarea>
+        </div>
+      </section>
+    </section>
+
+    <!-- =================== SUBMISSIONS VIEW =================== -->
+    <section class="view" id="view-subs">
+      <div class="actions" style="margin-bottom:14px; justify-content: flex-end;">
+        <button class="btn" id="btn-refresh">Refresh</button>
+        <button class="btn" id="btn-csv">Export CSV</button>
+        <button class="btn" id="btn-logout">Lock</button>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <section class="card">
+        <div class="filter-bar">
+          <div class="field">
+            <label>Search</label>
+            <input id="f-search" type="text" placeholder="Scorekeeper, location, DM..." />
+          </div>
+          <div class="field">
+            <label>Location</label>
+            <select id="f-loc"><option value="">All</option></select>
+          </div>
+          <div class="field">
+            <label>Verdict</label>
+            <select id="f-verdict">
+              <option value="">All</option>
+              <option>Exceeds</option>
+              <option>Meets</option>
+              <option>Needs Improvement</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow:auto; max-height:60vh; border:1px solid var(--border); border-radius:10px;">
+          <table class="subs">
+            <thead>
+              <tr>
+                <th>Date</th><th>Scorekeeper</th><th>Location</th><th>DM</th>
+                <th>Type</th><th>Score</th><th>Verdict</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="subs-body"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="subs-empty" style="display:none;">No submissions match.</div>
+      </section>
+    </section>
+
+    <footer class="note" id="footer-note"></footer>
+  </div>
+
+  <!-- Admin Key modal -->
+  <div class="modal-mask" id="modal-admin">
+    <div class="modal">
+      <h3>View submissions</h3>
+      <div class="field">
+        <label>Admin Key</label>
+        <input id="admin-key-in" type="password" placeholder="Enter admin key" />
+      </div>
+      <div class="row">
+        <button class="btn" id="admin-cancel">Cancel</button>
+        <button class="btn primary" id="admin-go">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail modal -->
+  <div class="modal-mask" id="modal-detail">
+    <div class="modal" style="min-width:520px;">
+      <h3 id="detail-title">Scorecard detail</h3>
+      <pre class="detail" id="detail-body"></pre>
+      <div class="row">
+        <button class="btn" id="detail-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+  const CFG = window.SCORECARD_CONFIG || {};
+  const HAS_BACKEND = !!CFG.APPS_SCRIPT_URL;
+
+  const STANDARDS = [
+    { id: 's1', weight: 0.10,
+      question: "How consistently does the Scorekeeper demonstrate reliability in attendance, including being punctual for scheduled games, arriving prepared to begin scorekeeping on time, and maintaining focus and professionalism throughout the shift?",
+      guide: {
+        Negative: ["Frequently late to scheduled games or shifts.","Occasionally misses scheduled assignments or requires last-minute coverage.","Arrives unprepared to begin scorekeeping on time (not set up, distracted, or lacking focus).","Requires reminders about schedule expectations or responsibilities.","Reliability issues disrupt game operations or create challenges for staff or teams."],
+        Neutral:  ["Usually arrives on time for scheduled games or shifts.","Generally prepared to begin scorekeeping with minimal delays.","Maintains acceptable focus and professionalism during games.","Attendance and reliability are consistent with basic expectations.","Rarely requires reminders about scheduling or responsibilities."],
+        Positive: ["Consistently arrives early or right on time for scheduled games.","Fully prepared to begin scorekeeping promptly and ensures everything is ready before the game starts.","Demonstrates strong focus, attentiveness, and professionalism throughout the shift.","Communicates proactively about scheduling or availability when needed.","Serves as a dependable and reliable member of the game operations team."]
+      }
+    },
+    { id: 's2', weight: 0.10,
+      question: "How effectively does the Scorekeeper manage the scorekeeper table setup and teardown, including preparing equipment before games, maintaining an organized table during play, and properly packing up materials after games?",
+      guide: {
+        Negative: ["Scorekeeper table is not properly set up before games begin.","Equipment (scoresheet, tablet, clock controls, pens, etc.) may be missing, disorganized, or not ready for use.","Requires reminders or assistance to complete setup.","Table area becomes cluttered or disorganized during the game.","Teardown is incomplete or materials are left out of place after games."],
+        Neutral:  ["Scorekeeper table is set up adequately before the game begins.","Necessary equipment is generally prepared and available.","Maintains a reasonably organized table during the game.","Teardown is completed and materials are returned to their proper place.","Meets the basic expectations for managing the scorekeeper table."],
+        Positive: ["Consistently completes full scorekeeper table setup before games start.","Ensures all materials and equipment are organized, accessible, and ready to use.","Maintains a clean and well-organized table throughout the game.","Completes thorough teardown and ensures equipment is properly stored.","Demonstrates strong ownership and professionalism in managing the scorekeeper table area."]
+      }
+    },
+    { id: 's3', weight: 0.30,
+      question: "How effectively does the Scorekeeper manage BallerTV operations, including setting up and tearing down equipment correctly, troubleshooting issues as they arise, using the equipment properly, and ensuring live streams are successfully recorded while maintaining accurate stats entry on the BallerTV iPad?",
+      guide: {
+        Negative: ["Setup/teardown is often incomplete, incorrect, or delayed (camera placement, power, connections, mounting, etc.).","Struggles to operate BallerTV equipment confidently or uses it incorrectly without seeking help early.","Troubleshooting is slow or ineffective, resulting in missed coverage or extended downtime.","Live streams are not consistently started on time, interrupted, or fail to record due to preventable errors.","Stats entry on the iPad is inconsistent, inaccurate, or not maintained throughout the game."],
+        Neutral:  ["Completes basic setup and teardown correctly with minimal guidance.","Uses BallerTV equipment appropriately and follows standard procedures most of the time.","Can handle minor troubleshooting (restarting stream, checking connections, basic fixes) or escalates issues when needed.","Live streams are generally recorded successfully with occasional minor issues that are resolved.","Stats on the iPad are entered adequately and maintained during gameplay with acceptable accuracy."],
+        Positive: ["Consistently completes correct, efficient setup and teardown of BallerTV equipment every shift.","Confidently and correctly operates all required equipment and follows best practices without reminders.","Proactively identifies and resolves issues quickly (or escalates immediately when necessary) to minimize disruption.","Ensures live streams start on time, remain stable, and are successfully recorded for every game.","Maintains accurate, timely stats entry on the BallerTV iPad throughout the game, demonstrating strong attention to detail and consistency."]
+      }
+    },
+    { id: 's4', weight: 0.20,
+      question: "How accurately and consistently does the Scorekeeper record game statistics, ensuring plays, scores, fouls, and other key information are entered correctly and in real time?",
+      guide: {
+        Negative: ["Frequently records incorrect or missing stats during games.","Falls behind on stat entry, requiring corrections after plays or by supervisors.","Demonstrates limited understanding of stat tracking procedures.","Errors impact the accuracy of the game record or BallerTV reporting.","Requires frequent reminders or assistance to maintain stat accuracy."],
+        Neutral:  ["Records most stats accurately during the game with occasional minor errors.","Keeps up with gameplay and maintains generally consistent stat entry.","Understands basic stat tracking expectations and follows standard procedures.","Corrections are minor and do not significantly affect the game record.","Meets baseline expectations for stat accuracy and consistency."],
+        Positive: ["Consistently records all game statistics accurately and in real time.","Demonstrates strong attention to detail and awareness of gameplay events.","Rarely requires corrections and maintains a reliable official game record.","Quickly identifies and corrects minor discrepancies when they occur.","Contributes to smooth game operations through highly accurate stat tracking."]
+      }
+    },
+    { id: 's5', weight: 0.30,
+      question: "How effectively does the Scorekeeper engage with players on their court, demonstrating professionalism, approachability, and clear communication to support a positive game environment?",
+      guide: {
+        Negative: ["Rarely interacts with players or appears disengaged from the court environment.","Communication with players may be unclear, dismissive, or unprofessional.","Does not acknowledge players when appropriate (e.g., answering score questions, clarifying fouls, etc.).","Body language or attitude may appear uninterested or unapproachable.","Requires reminders to maintain a professional and supportive presence at the court."],
+        Neutral:  ["Responds to players when approached with questions about the score, fouls, or game details.","Maintains a generally professional and respectful demeanor.","Communicates clearly when necessary but may not actively engage beyond required interactions.","Demonstrates an acceptable level of presence and awareness of the players on the court.","Meets baseline expectations for professionalism and communication."],
+        Positive: ["Maintains a professional, approachable presence with players throughout the game.","Communicates clearly and respectfully when answering questions or clarifying game information.","Demonstrates awareness of the court environment and helps support smooth communication between players, officials, and staff when needed.","Handles interactions calmly and professionally, even during high-energy or competitive moments.","Contributes to a positive and well-managed game atmosphere through strong communication and engagement."]
+      }
+    }
+  ];
+
+  const STORAGE_KEY = "scorekeeper-scorecard-draft-v1";
+  const ADMIN_CACHE = "scorekeeper-admin-key";
+  const ratings = {};
+  const comments = {};
+
+  function el(tag, attrs = {}, children = []) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") e.className = v;
+      else if (k === "html") e.innerHTML = v;
+      else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v);
+    }
+    for (const c of [].concat(children)) {
+      if (c == null) continue;
+      e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return e;
+  }
+
+  function renderGuide(s) {
+    const g = el("div", { class: "guide", id: `guide-${s.id}` });
+    [
+      { key: "Negative", cls: "neg", label: "Needs Improvement" },
+      { key: "Neutral",  cls: "neu", label: "Meets Expectations" },
+      { key: "Positive", cls: "pos", label: "Exceeds Expectations" }
+    ].forEach(sec => {
+      g.appendChild(el("h4", { class: sec.cls }, `${sec.key} — ${sec.label}`));
+      const ul = el("ul");
+      s.guide[sec.key].forEach(line => ul.appendChild(el("li", {}, line)));
+      g.appendChild(ul);
+    });
+    return g;
+  }
+
+  function renderStandard(s, i) {
+    const wrap = el("div", { class: "standard", "data-id": s.id });
+    const left = el("div");
+    left.appendChild(el("div", { class: "q-num" }, [
+      `Standard ${i+1}`,
+      el("span", { class: "weight" }, `${Math.round(s.weight*100)}% weight`)
+    ]));
+    left.appendChild(el("p", { class: "q" }, s.question));
+
+    const toggle = el("div", { class: "guide-toggle", role: "button", tabindex: "0" }, [
+      el("span", { class: "chev" }, "▶"), "Show rating guide"
+    ]);
+    toggle.addEventListener("click", () => {
+      const g = wrap.querySelector(`#guide-${s.id}`);
+      g.classList.toggle("open");
+      toggle.classList.toggle("open");
+      toggle.lastChild.textContent = g.classList.contains("open") ? "Hide rating guide" : "Show rating guide";
+    });
+    left.appendChild(toggle);
+    left.appendChild(renderGuide(s));
+
+    const cmt = el("div", { class: "comment", style: "margin-top:10px;" });
+    const ta = el("textarea", { placeholder: "Optional comment for this standard..." });
+    ta.addEventListener("input", (e) => { comments[s.id] = e.target.value; saveDraft(); });
+    cmt.appendChild(ta);
+    left.appendChild(cmt);
+
+    const right = el("div", { class: "rate" });
+    const row = el("div", { class: "rate-row" });
+    ["Negative","Neutral","Positive"].forEach(val => {
+      const b = el("button", { class: "rate-btn", "data-val": val, type: "button" }, val);
+      b.addEventListener("click", () => {
+        ratings[s.id] = val;
+        wrap.querySelectorAll(".rate-btn").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        updateScore(); saveDraft();
+      });
+      row.appendChild(b);
+    });
+    right.appendChild(row);
+    wrap.appendChild(left); wrap.appendChild(right);
+    return wrap;
+  }
+
+  const standardsRoot = document.getElementById("standards");
+  STANDARDS.forEach((s, i) => standardsRoot.appendChild(renderStandard(s, i)));
+
+  function ratingValue(r) { return r === "Positive" ? 1 : r === "Neutral" ? 0.5 : r === "Negative" ? 0 : null; }
+
+  function updateScore() {
+    let total = 0, anyRated = false;
+    STANDARDS.forEach(s => {
+      const v = ratingValue(ratings[s.id]);
+      if (v !== null) { total += v * s.weight; anyRated = true; }
+    });
+    const pct = Math.round(total * 100);
+    document.getElementById("score-fill").style.width = pct + "%";
+    document.getElementById("score-num").textContent = pct + "%";
+    const v = document.getElementById("verdict");
+    v.classList.remove("pos","neu","neg");
+    if (!anyRated) { v.textContent = "Not started"; return; }
+    if (pct >= 80) { v.textContent = "Exceeds Expectations"; v.classList.add("pos"); }
+    else if (pct >= 50) { v.textContent = "Meets Expectations"; v.classList.add("neu"); }
+    else { v.textContent = "Needs Improvement"; v.classList.add("neg"); }
+  }
+
+  function fields() {
+    return {
+      location: val("location"), province: val("province"), scorekeeper: val("scorekeeper"),
+      dm: val("dm"), lm: val("lm"), date: val("date"), atype: val("atype"),
+      gotit: document.getElementById("gotit").checked, gotitName: val("gotit-name"),
+      followUp: val("follow-up"), additional: val("addl"), ratings, comments
+    };
+  }
+  function val(id) { return document.getElementById(id).value; }
+  function setVal(id, v) { const e = document.getElementById(id); if (e && v != null) e.value = v; }
+
+  function setFields(d) {
+    if (!d) return;
+    ["location","province","scorekeeper","dm","lm","date","atype","gotit-name","follow-up","addl"].forEach(k => setVal(k, d[k] || d[k.replace("-","")] ));
+    setVal("gotit-name", d.gotitName); setVal("follow-up", d.followUp); setVal("addl", d.additional);
+    document.getElementById("gotit").checked = !!d.gotit;
+    Object.assign(ratings, d.ratings || {});
+    Object.assign(comments, d.comments || {});
+    STANDARDS.forEach(s => {
+      const wrap = document.querySelector(`.standard[data-id="${s.id}"]`);
+      if (!wrap) return;
+      const ta = wrap.querySelector("textarea");
+      if (ta && comments[s.id]) ta.value = comments[s.id];
+      wrap.querySelectorAll(".rate-btn").forEach(b => b.classList.toggle("active", b.dataset.val === ratings[s.id]));
+    });
+    updateScore();
+  }
+
+  function saveDraft() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fields())); } catch (e) {} }
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return toast("No draft saved");
+      setFields(JSON.parse(raw)); toast("Draft loaded");
+    } catch (e) { toast("Failed to load draft"); }
+  }
+  function clearAll() {
+    if (!confirm("Reset the entire scorecard?")) return;
+    Object.keys(ratings).forEach(k => delete ratings[k]);
+    Object.keys(comments).forEach(k => delete comments[k]);
+    document.querySelectorAll("#view-score input, #view-score textarea").forEach(i => {
+      if (i.type === "checkbox") i.checked = false; else i.value = "";
+    });
+    document.getElementById("atype").value = "Planned";
+    document.querySelectorAll(".rate-btn").forEach(b => b.classList.remove("active"));
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById("date").valueAsDate = new Date();
+    updateScore(); toast("Reset");
+  }
+
+  function exportJSON() {
+    const data = fields();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = (data.date || new Date().toISOString().slice(0,10));
+    const who = (data.scorekeeper || "scorekeeper").replace(/\s+/g, "_");
+    a.href = url; a.download = `scorecard_${who}_${stamp}.json`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  async function submitToSheet() {
+    if (!HAS_BACKEND) {
+      toast("Backend not configured — exporting JSON instead");
+      exportJSON(); return;
+    }
+    const d = fields();
+    if (!d.scorekeeper) return toast("Add scorekeeper name first");
+    const payload = Object.assign({}, d, { submitKey: CFG.SUBMIT_KEY });
+    const btns = document.querySelectorAll("#btn-submit, #btn-submit-2");
+    btns.forEach(b => b.disabled = true);
+    try {
+      // Apps Script web apps don't allow custom headers without preflight; send as text/plain to avoid CORS preflight
+      const r = await fetch(CFG.APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "submission failed");
+      toast(`Submitted • Score ${j.score}% • ${j.verdict}`);
+    } catch (err) {
+      toast("Submit failed: " + err.message);
+    } finally {
+      btns.forEach(b => b.disabled = false);
+    }
+  }
+
+  // ====== Submissions view ======
+  let _rows = [];
+
+  function showStats(rows) {
+    const box = document.getElementById("stats");
+    box.innerHTML = "";
+    const n = rows.length;
+    const avg = n ? Math.round(rows.reduce((a,r) => a + (Number(r.score)||0), 0) / n) : 0;
+    const exc = rows.filter(r => r.verdict === "Exceeds").length;
+    const need = rows.filter(r => r.verdict === "Needs Improvement").length;
+    [
+      { label: "Submissions", value: n },
+      { label: "Average Score", value: avg + "%" },
+      { label: "Exceeds", value: exc },
+      { label: "Needs Improvement", value: need }
+    ].forEach(s => {
+      const d = el("div", { class: "stat" });
+      d.appendChild(el("div", { class: "label" }, s.label));
+      d.appendChild(el("div", { class: "value" }, String(s.value)));
+      box.appendChild(d);
+    });
+  }
+
+  function pillCls(verdict) {
+    if (verdict === "Exceeds") return "pos";
+    if (verdict === "Meets") return "neu";
+    if (verdict === "Needs Improvement") return "neg";
+    return "";
+  }
+
+  function renderRows() {
+    const tbody = document.getElementById("subs-body");
+    tbody.innerHTML = "";
+    const q = document.getElementById("f-search").value.toLowerCase();
+    const loc = document.getElementById("f-loc").value;
+    const verdict = document.getElementById("f-verdict").value;
+    const filtered = _rows.filter(r => {
+      if (loc && r.location !== loc) return false;
+      if (verdict && r.verdict !== verdict) return false;
+      if (q) {
+        const blob = [r.scorekeeper, r.location, r.dm, r.lm].join(" ").toLowerCase();
+        if (!blob.includes(q)) return false;
+      }
+      return true;
+    });
+    document.getElementById("subs-empty").style.display = filtered.length ? "none" : "block";
+    showStats(filtered);
+    filtered.forEach(r => {
+      const tr = el("tr");
+      const dateStr = r.date || (r.submittedAt ? r.submittedAt.slice(0,10) : "");
+      tr.appendChild(el("td", {}, dateStr));
+      tr.appendChild(el("td", {}, r.scorekeeper || "—"));
+      tr.appendChild(el("td", {}, r.location || "—"));
+      tr.appendChild(el("td", {}, r.dm || "—"));
+      tr.appendChild(el("td", {}, r.atype || "—"));
+      tr.appendChild(el("td", {}, [el("span", { class: "pill-score " + pillCls(r.verdict) }, (r.score||0) + "%")]));
+      tr.appendChild(el("td", {}, r.verdict || "—"));
+      const btn = el("button", { class: "btn", style: "padding:6px 10px;font-size:12px;" }, "View");
+      btn.addEventListener("click", () => showDetail(r));
+      tr.appendChild(el("td", {}, btn));
+      tbody.appendChild(tr);
+    });
+  }
+
+  function showDetail(r) {
+    document.getElementById("detail-title").textContent = `${r.scorekeeper || "Scorekeeper"} — ${r.date || ""}`;
+    const lines = [];
+    const map = [
+      ["Submitted", r.submittedAt], ["Location", r.location], ["Province", r.province],
+      ["DM", r.dm], ["LM", r.lm], ["Type", r.atype],
+      ["Score", (r.score||0) + "% — " + (r.verdict||"")],
+      ["", ""],
+      ["Reliability (10%)",   `${r.s1_rating || "—"}${r.s1_comment ? "\n  " + r.s1_comment : ""}`],
+      ["Setup/Teardown (10%)",`${r.s2_rating || "—"}${r.s2_comment ? "\n  " + r.s2_comment : ""}`],
+      ["BallerTV (30%)",      `${r.s3_rating || "—"}${r.s3_comment ? "\n  " + r.s3_comment : ""}`],
+      ["Stat Accuracy (20%)", `${r.s4_rating || "—"}${r.s4_comment ? "\n  " + r.s4_comment : ""}`],
+      ["Player Engagement (30%)", `${r.s5_rating || "—"}${r.s5_comment ? "\n  " + r.s5_comment : ""}`],
+      ["", ""],
+      ["Got It", r.gotIt + (r.gotItName ? ` (${r.gotItName})` : "")],
+      ["Follow-Up", r.followUp || "—"],
+      ["Additional Comments", r.additional || "—"]
+    ];
+    lines.push(...map.map(([k,v]) => k ? `${k}: ${v}` : ""));
+    document.getElementById("detail-body").textContent = lines.join("\n");
+    document.getElementById("modal-detail").classList.add("show");
+  }
+
+  async function loadSubmissions(adminKey) {
+    if (!HAS_BACKEND) return toast("Backend not configured");
+    try {
+      const r = await fetch(`${CFG.APPS_SCRIPT_URL}?action=list&key=${encodeURIComponent(adminKey)}`);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "load failed");
+      _rows = (j.rows || []).reverse();
+      const locs = Array.from(new Set(_rows.map(r => r.location).filter(Boolean))).sort();
+      const sel = document.getElementById("f-loc");
+      sel.innerHTML = `<option value="">All</option>` + locs.map(l => `<option>${l}</option>`).join("");
+      renderRows();
+      sessionStorage.setItem(ADMIN_CACHE, adminKey);
+    } catch (err) {
+      toast("Load failed: " + err.message);
+      sessionStorage.removeItem(ADMIN_CACHE);
+    }
+  }
+
+  function exportCSV() {
+    if (!_rows.length) return toast("Nothing to export");
+    const cols = ["submittedAt","date","scorekeeper","location","province","dm","lm","atype","score","verdict",
+      "s1_rating","s2_rating","s3_rating","s4_rating","s5_rating","gotIt","gotItName","followUp","additional"];
+    const esc = v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+    const lines = [cols.join(",")].concat(_rows.map(r => cols.map(c => esc(r[c])).join(",")));
+    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `scorecards_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+
+  // ====== Tabs / modal ======
+  document.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", () => {
+      const v = t.dataset.view;
+      document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
+      document.querySelectorAll(".view").forEach(x => x.classList.toggle("active", x.id === "view-" + v));
+      if (v === "subs") {
+        const cached = sessionStorage.getItem(ADMIN_CACHE);
+        if (HAS_BACKEND && cached) loadSubmissions(cached);
+        else if (HAS_BACKEND) document.getElementById("modal-admin").classList.add("show");
+        else toast("Backend not configured — see config.js");
+      }
+    });
+  });
+
+  document.getElementById("admin-cancel").addEventListener("click", () => {
+    document.getElementById("modal-admin").classList.remove("show");
+  });
+  document.getElementById("admin-go").addEventListener("click", () => {
+    const k = document.getElementById("admin-key-in").value.trim();
+    if (!k) return;
+    document.getElementById("modal-admin").classList.remove("show");
+    loadSubmissions(k);
+  });
+  document.getElementById("admin-key-in").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("admin-go").click();
+  });
+  document.getElementById("detail-close").addEventListener("click", () => {
+    document.getElementById("modal-detail").classList.remove("show");
+  });
+
+  document.getElementById("btn-refresh").addEventListener("click", () => {
+    const cached = sessionStorage.getItem(ADMIN_CACHE);
+    if (cached) loadSubmissions(cached);
+    else document.getElementById("modal-admin").classList.add("show");
+  });
+  document.getElementById("btn-csv").addEventListener("click", exportCSV);
+  document.getElementById("btn-logout").addEventListener("click", () => {
+    sessionStorage.removeItem(ADMIN_CACHE);
+    _rows = []; renderRows(); showStats([]);
+    toast("Locked");
+  });
+  ["f-search","f-loc","f-verdict"].forEach(id => document.getElementById(id).addEventListener("input", renderRows));
+
+  // ====== Boot ======
+  document.getElementById("date").valueAsDate = new Date();
+  ["location","province","scorekeeper","dm","lm","date","atype","gotit","gotit-name","follow-up","addl"].forEach(id => {
+    const e = document.getElementById(id);
+    e.addEventListener("input", saveDraft); e.addEventListener("change", saveDraft);
+  });
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) setFields(JSON.parse(raw)); } catch (e) {}
+
+  document.getElementById("btn-save").addEventListener("click", () => { saveDraft(); toast("Draft saved"); });
+  document.getElementById("btn-load").addEventListener("click", loadDraft);
+  document.getElementById("btn-reset").addEventListener("click", clearAll);
+  document.getElementById("btn-export").addEventListener("click", exportJSON);
+  document.getElementById("btn-print").addEventListener("click", () => window.print());
+  document.getElementById("btn-submit").addEventListener("click", submitToSheet);
+  document.getElementById("btn-submit-2").addEventListener("click", submitToSheet);
+
+  // Connection indicator
+  const conn = document.getElementById("conn");
+  const connText = document.getElementById("conn-text");
+  if (HAS_BACKEND) { conn.classList.add("online"); connText.textContent = "Connected to Sheet"; }
+  else { conn.classList.add("offline"); connText.textContent = "Local only — see config.js"; }
+
+  // Footer hint
+  const note = document.getElementById("footer-note");
+  note.textContent = HAS_BACKEND
+    ? "Submissions append to your Google Sheet. Drafts auto-save to this browser."
+    : "Backend not configured. Edit config.js with your Apps Script URL + keys to enable Submit and Submissions.";
+
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  updateScore();
+</script>
+</body>
+</html>
