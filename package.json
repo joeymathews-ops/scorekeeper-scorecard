@@ -1,0 +1,9 @@
+{
+  "name": "scorekeeper-scorecard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Scorekeeper Scorecard — DM assessment tool with Vercel KV backend",
+  "dependencies": {
+    "@vercel/kv": "^3.0.0"
+  }
+}
